@@ -325,11 +325,6 @@ Resources:
             CidrIp: !Ref AllowedSSHCIDR
             Description: "SSH access (fallback)"
           - !Ref AWS::NoValue
-        - IpProtocol: tcp
-          FromPort: 5900
-          ToPort: 5900
-          CidrIp: !Ref AllowedSSHCIDR
-          Description: "VNC access for Mac GUI"
       SecurityGroupEgress:
         - IpProtocol: -1
           CidrIp: "0.0.0.0/0"
