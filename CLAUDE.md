@@ -56,7 +56,7 @@ Both templates share these key parameters:
 | Category | Resources |
 |----------|-----------|
 | Networking | VPC, Internet Gateway, public/private subnets, route tables |
-| VPC Endpoints | Bedrock Runtime, SSM, SSM Messages, EC2 Messages (conditional) |
+| VPC Endpoints | Bedrock Runtime, Bedrock Mantle, SSM, SSM Messages, EC2 Messages (conditional) |
 | IAM | Role (SSM + CloudWatch + Bedrock + SSM Parameter Store), Instance Profile |
 | Security | EC2 security group, VPC endpoint security group (conditional) |
 | Compute | EC2 instance with ~200-line UserData bootstrap script |
@@ -88,6 +88,9 @@ The EC2 UserData script installs and configures:
 | Claude Sonnet 4 | `global.anthropic.claude-sonnet-4-20250514-v1:0` |
 | DeepSeek R1 | `us.deepseek.r1-v1:0` |
 | Llama 3.3 70B | `us.meta.llama3-3-70b-instruct-v1:0` |
+| Kimi K2.5 | `moonshotai.kimi-k2.5` |
+
+**Note on Project Mantle models:** Kimi K2.5 is a Project Mantle model that uses the `bedrock-mantle` endpoint (`https://bedrock-mantle.REGION.api.aws/v1`) for OpenAI-compatible API access. While it also works through the standard Converse API (`bedrock-runtime`), there are known issues with tool-call parsing. The templates include both `bedrock-runtime` and `bedrock-mantle` VPC endpoints to support all models.
 
 ## Supported Regions
 
