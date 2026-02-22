@@ -559,6 +559,25 @@ Common issues: SSM connection, Web UI token mismatch, model configuration, port 
 
 **Full guide**: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 
+## SSH-like CLI Access via SSM
+
+If you want to access the EC2 instance directly via command line (similar to SSH), use SSM Session Manager:
+
+```bash
+# 1. Start an interactive session (replace with your instance ID and region)
+aws ssm start-session --target i-xxxxxxxxxxxxxxxxx --region us-east-1
+
+# 2. Switch to the ubuntu user
+sudo su - ubuntu
+
+# 3. Now you can run openclaw commands directly
+openclaw --version
+openclaw gateway status
+```
+
+> **Tip**: Your instance ID is shown in the CloudFormation Outputs tab under `InstanceId`.
+> Make sure you have the [SSM Session Manager Plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) installed locally.
+
 ## Comparison with Original openclaw
 
 ### Deployment Options

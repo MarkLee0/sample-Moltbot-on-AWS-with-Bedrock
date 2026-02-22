@@ -555,6 +555,25 @@ aws ce get-cost-and-usage \
 
 ## 故障排查
 
+### 通过 SSM 命令行登录实例
+
+如果需要像 SSH 一样直接登录 EC2 实例操作命令行，使用 SSM Session Manager：
+
+```bash
+# 1. 启动交互式会话（替换为你的实例 ID 和区域）
+aws ssm start-session --target i-xxxxxxxxxxxxxxxxx --region us-east-1
+
+# 2. 切换到 ubuntu 用户
+sudo su - ubuntu
+
+# 3. 现在可以直接执行 openclaw 命令
+openclaw --version
+openclaw gateway status
+```
+
+> **提示**：实例 ID 在 CloudFormation 输出标签的 `InstanceId` 字段中。
+> 本地需要安装 [SSM Session Manager Plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html)。
+
 ### 预检查失败
 
 ```bash
