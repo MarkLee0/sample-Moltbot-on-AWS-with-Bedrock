@@ -23,16 +23,13 @@
 ### 核心优势
 
 **1. 多模型灵活性与成本优势**
-- **Nova Pro 默认**：$0.80/$3.20 每百万 tokens，比 Claude 的 $3/$15 便宜 73%
+- **Nova 2 Lite 默认**：$0.30/$2.50 每百万 tokens，比 Claude 便宜 90%
 - **8 个模型可选**：一个参数切换 Nova、Claude、DeepSeek、Llama
-- **智能路由**：简单任务用 Nova Lite，复杂推理用 Claude Sonnet
 - **无供应商锁定**：切换模型无需改代码或重新部署
 
-**2. 灵活的实例配置与 Graviton 优势（推荐）**
-- **x86 和 ARM 双支持**：可选择 t3/c5（x86）或 t4g/c7g（Graviton ARM）
+**2. Graviton ARM 优势（推荐）**
 - **推荐 Graviton**：性价比比 x86 高 20-40%
 - **成本示例**：t4g.medium（$24/月）vs t3.medium（$30/月）- 相同配置，节省 20%
-- **灵活配置**：从 t4g.small（$12/月）到 c7g.xlarge（$108/月）按需选择
 - **节能环保**：Graviton 能耗比 x86 低 70%
 
 **3. 企业级安全与合规**
@@ -44,27 +41,22 @@
 **4. 云原生自动化**
 - **一键部署**：CloudFormation 自动化 VPC、IAM、EC2、Bedrock 配置
 - **基础设施即代码**：可重复、版本控制的部署
-- **多区域支持**：在 4 个区域使用相同配置部署
+- **多区域支持**：在多个区域使用相同配置部署
 
 ## 核心优势
 
-- 🚀 **Graviton ARM 处理器**：性价比比 x86 高 20-40%
-- 💰 **Nova 2 Lite 默认**：比 Claude 便宜 90%，日常任务表现出色
-- 🔐 **零密钥管理** - 一个 IAM 角色替代多个 API 密钥（Anthropic、OpenAI、DeepSeek）
-- 🤖 **多模型支持** - 切换 Claude 4.6、Nova、DeepSeek
+- 🔐 **零密钥管理** - 一个 IAM 角色替代多个 API 密钥
+- 🤖 **多模型支持** - 一个参数切换 Claude、Nova、DeepSeek
 - 🏢 **企业级** - 完整的 CloudTrail 审计日志和合规支持
-- ⚡ **一键部署** - CloudFormation 8 分钟自动化所有配置
+- ⚡ **一键部署** - CloudFormation 约 8 分钟自动化所有配置
 - 🔒 **安全访问** - SSM Session Manager，无需暴露公网端口
+- 💰 **成本可见** - AWS 原生成本追踪和优化
 
 ## 部署选项
-
-根据您的需求选择部署方式：
 
 ### 🚀 无服务器部署（AgentCore Runtime）- 生产环境推荐
 
 **[→ 使用 AgentCore Runtime 部署](README_AGENTCORE.md)**
-
-适合可变工作负载和成本优化：
 
 | 特性 | AgentCore Runtime | 传统 EC2 |
 |------|-------------------|----------|
@@ -74,53 +66,31 @@
 | **容器隔离** | ✅ 每次执行隔离的 microVM | ⚠️ 共享实例 |
 | **管理** | ✅ 完全托管运行时 | ⚠️ 手动扩展 |
 
-**成本示例：**
-- 传统 EC2：$50/月（24/7 运行）
-- AgentCore：$15-30/月（仅在 agent 执行时付费）
-- **节省：典型使用场景下节省 40-70%**
-
-**[→ 完整 AgentCore 文档和部署指南](README_AGENTCORE.md)**
+典型使用场景节省 40-70%。**[→ 完整 AgentCore 文档](README_AGENTCORE.md)**
 
 ---
 
 ### 💻 标准部署（EC2）
 
-传统部署方式，OpenClaw 运行在专用 EC2 实例上：
-- **Linux（Graviton/x86）**：Graviton ARM 提供最佳性价比
-- **macOS（Apple Silicon）**：适合 iOS/macOS 开发工作流
-
-适合以下场景：
-- 可预测的固定成本
-- 完全控制实例
-- 无论使用情况如何都需要 24/7 可用性
+适合需要固定成本、完全控制实例、24/7 可用的场景。
 
 ## 快速开始
 
-### ⚡ 一键部署（强烈推荐 - 8 分钟即可使用！）
-
-> **为什么选择 CloudFormation？** 全自动配置，无需手动操作。点击按钮，等待 8 分钟，获取 URL 即可使用！
+### ⚡ 一键部署（推荐 - 约 8 分钟）
 
 **只需 3 步**：
 1. ✅ 点击下方"部署"按钮
 2. ✅ 在表单中选择 EC2 密钥对
 3. ✅ 等待约 8 分钟 → 查看"输出"标签 → 复制 URL → 开始使用！
 
-**自动完成的操作**：
-- 创建 VPC、子网、安全组
-- 启动 EC2 实例
-- 安装 Node.js、Docker、Clawdbot
-- 配置 Bedrock 集成
-- 生成安全网关令牌
-- 输出可直接使用的 URL
-
-点击部署：
+**Linux（Graviton/x86）- 推荐**
 
 | 区域 | 部署 |
 |------|------|
-| **美国西部（俄勒冈）** | [![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/create/review?stackName=clawdbot-bedrock&templateURL=https://sharefile-jiade.s3.cn-northwest-1.amazonaws.com.cn/clawdbot-bedrock.yaml) |
-| **美国东部（弗吉尼亚）** | [![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?stackName=clawdbot-bedrock&templateURL=https://sharefile-jiade.s3.cn-northwest-1.amazonaws.com.cn/clawdbot-bedrock.yaml) |
-| **欧洲（爱尔兰）** | [![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/create/review?stackName=clawdbot-bedrock&templateURL=https://sharefile-jiade.s3.cn-northwest-1.amazonaws.com.cn/clawdbot-bedrock.yaml) |
-| **亚太（东京）** | [![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/create/review?stackName=clawdbot-bedrock&templateURL=https://sharefile-jiade.s3.cn-northwest-1.amazonaws.com.cn/clawdbot-bedrock.yaml) |
+| **美国西部（俄勒冈）** | [![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/create/review?stackName=openclaw-bedrock&templateURL=https://sharefile-jiade.s3.cn-northwest-1.amazonaws.com.cn/clawdbot-bedrock.yaml) |
+| **美国东部（弗吉尼亚）** | [![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?stackName=openclaw-bedrock&templateURL=https://sharefile-jiade.s3.cn-northwest-1.amazonaws.com.cn/clawdbot-bedrock.yaml) |
+| **欧洲（爱尔兰）** | [![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/create/review?stackName=openclaw-bedrock&templateURL=https://sharefile-jiade.s3.cn-northwest-1.amazonaws.com.cn/clawdbot-bedrock.yaml) |
+| **亚太（东京）** | [![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/create/review?stackName=openclaw-bedrock&templateURL=https://sharefile-jiade.s3.cn-northwest-1.amazonaws.com.cn/clawdbot-bedrock.yaml) |
 
 **macOS (EC2 Mac) - 适合 Apple 开发**
 
@@ -129,9 +99,7 @@
 | **美国西部（俄勒冈）** | [![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/create/review?stackName=openclaw-mac&templateURL=https://sharefile-jiade.s3.cn-northwest-1.amazonaws.com.cn/clawdbot-bedrock-mac.yaml) | $468-792 |
 | **美国东部（弗吉尼亚）** | [![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?stackName=openclaw-mac&templateURL=https://sharefile-jiade.s3.cn-northwest-1.amazonaws.com.cn/clawdbot-bedrock-mac.yaml) | $468-792 |
 
-> **Mac 实例**：24 小时最低分配期，适合 iOS/macOS 开发团队。[了解更多 →](#macos-deployment)
-
-> **说明**：使用 Global CRIS 配置文件 - 在全球 30+ 区域可用。可在任意区域部署，请求会自动路由到最优位置。
+> **Mac 实例**：24 小时最低分配期，适合 iOS/macOS 开发团队。
 
 ---
 
@@ -143,61 +111,54 @@
 
 ---
 
-> **注意**：在目标区域创建 EC2 密钥对
+部署后查看 CloudFormation 输出标签，按步骤操作：
 
-### 手动部署
+1. **安装 SSM 插件**：点击 `Step1InstallSSMPlugin` 链接（一次性）
+2. **端口转发**：复制 `Step2PortForwarding` 命令，在本地运行（保持终端打开）
+3. **打开 URL**：复制 `Step3AccessURL`，在浏览器打开（已含 token）
+4. **开始使用**：在 Web UI 连接 WhatsApp/Telegram/Discord
 
-**下载并上传**：
+![CloudFormation 输出](images/20260128-105244.jpeg)
+![openclaw Web UI](images/20260128-105059.jpg)
 
-1. 下载模板：[clawdbot-bedrock.yaml](clawdbot-bedrock.yaml)
-2. 访问 [CloudFormation Console](https://console.aws.amazon.com/cloudformation/)
-3. 上传模板并部署
+> **部署前**：在 [Bedrock Console](https://console.aws.amazon.com/bedrock/) 启用所需模型
 
-**使用 AWS CLI**：
+### 手动部署（CLI）
 
 ```bash
 aws cloudformation create-stack \
-  --stack-name clawdbot-bedrock \
+  --stack-name openclaw-bedrock \
   --template-body file://clawdbot-bedrock.yaml \
   --parameters ParameterKey=KeyPairName,ParameterValue=your-keypair \
   --capabilities CAPABILITY_IAM \
   --region us-west-2
 
-# 等待完成
 aws cloudformation wait stack-create-complete \
-  --stack-name clawdbot-bedrock \
+  --stack-name openclaw-bedrock \
   --region us-west-2
 ```
 
-### 访问 Clawdbot
-
-![CloudFormation 输出](images/20260128-105244.jpeg)
-
-![Clawdbot Web UI](images/20260128-105059.jpg)
+### 访问 openclaw
 
 ```bash
-# 获取实例 ID
+# 获取实例 ID（或从 CloudFormation 输出标签查看）
 INSTANCE_ID=$(aws cloudformation describe-stacks \
-  --stack-name clawdbot-bedrock \
+  --stack-name openclaw-bedrock \
   --query 'Stacks[0].Outputs[?OutputKey==`InstanceId`].OutputValue' \
   --output text)
 
 # 启动端口转发（保持终端打开）
 aws ssm start-session \
   --target $INSTANCE_ID \
+  --region us-west-2 \
   --document-name AWS-StartPortForwardingSession \
   --parameters '{"portNumber":["18789"],"localPortNumber":["18789"]}'
 
-# 获取 token（新终端）
-aws ssm start-session --target $INSTANCE_ID
-sudo su - ubuntu
-cat ~/.clawdbot/gateway_token.txt
-
-# 在浏览器打开
+# 在浏览器打开（token 在 CloudFormation 输出 Step3AccessURL 中）
 http://localhost:18789/?token=<你的token>
 ```
 
-## 如何使用 Clawdbot
+## 如何使用 openclaw
 
 ### 连接消息平台
 
@@ -205,69 +166,45 @@ http://localhost:18789/?token=<你的token>
 
 1. 在 Web UI 点击 "Channels" → "Add Channel" → "WhatsApp"
 2. 用手机 WhatsApp 扫描二维码
-   - 打开 WhatsApp → 设置 → 已关联的设备
-   - 点击"关联设备"
-   - 扫描二维码
+   - 打开 WhatsApp → 设置 → 已关联的设备 → 点击"关联设备"
 3. 发送测试消息
 
-**提示**：建议使用专用手机号，或启用 `selfChatMode`。
+📖 **完整指南**：https://docs.openclaw.ai/channels/whatsapp
 
 #### Telegram
 
-1. 创建 Bot：与 [@BotFather](https://t.me/botfather) 对话
-   ```
-   /newbot
-   选择名称：My Clawdbot
-   选择用户名：my_clawdbot_bot
-   ```
-2. 复制 Bot Token（格式：`123456:ABC-DEF...`）
-3. 在 Web UI 配置 Telegram channel
-4. 测试：向你的 bot 发送 `/start`
+1. 与 [@BotFather](https://t.me/botfather) 对话创建 Bot，获取 token
+2. 在 Web UI 配置 Telegram channel
+3. 向你的 bot 发送 `/start` 测试
+
+📖 **完整指南**：https://docs.openclaw.ai/channels/telegram
 
 #### Discord
 
-1. 创建 Bot：访问 [Discord Developer Portal](https://discord.com/developers/applications)
-   - 点击 "New Application"
-   - 进入 "Bot" → "Add Bot"
-   - 复制 bot token
-   - 启用 intents：Message Content、Server Members
-2. 邀请 Bot：生成邀请链接
-   ```
-   https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=8&scope=bot
-   ```
-3. 在 Web UI 配置 Discord channel
-4. 测试：在 Discord 频道中 @你的bot
+1. 访问 [Discord Developer Portal](https://discord.com/developers/applications) 创建 Bot，复制 token
+2. 在 Web UI 配置 Discord channel
+3. 在频道中 @你的 bot 测试
+
+📖 **完整指南**：https://docs.openclaw.ai/channels/discord
 
 #### Slack
 
-1. 创建 App：访问 [Slack API](https://api.slack.com/apps)
-2. 配置 Bot Token Scopes（chat:write、channels:history）
-3. 安装 App 到工作区
-4. 在 Web UI 配置 Slack channel
-5. 测试：邀请 bot 到频道并 @它
+1. 访问 [Slack API](https://api.slack.com/apps) 创建 App
+2. 配置 Bot Token Scopes，安装到工作区
+3. 在 Web UI 配置 Slack channel
 
+📖 **完整指南**：https://docs.openclaw.ai/channels/slack
 
-
-### 使用 Clawdbot
-
-#### 发送消息
+### 使用 openclaw
 
 **通过 WhatsApp/Telegram/Discord**：直接发送消息！
 
 ```
 你：今天天气怎么样？
-Clawdbot：让我帮你查一下...
+openclaw：让我帮你查一下...
 ```
 
-**通过 CLI**：
-```bash
-# SSH/SSM 连接到实例后
-clawdbot message send --to +1234567890 --message "你好"
-```
-
-#### 聊天命令
-
-在任何连接的频道发送：
+常用聊天命令：
 
 | 命令 | 说明 |
 |------|------|
@@ -276,154 +213,70 @@ clawdbot message send --to +1234567890 --message "你好"
 | `/think high` | 启用深度思考模式 |
 | `/help` | 显示可用命令 |
 
-#### 语音消息
+**语音消息**：WhatsApp/Telegram 直接发送语音，openclaw 会转录并回复。
 
-**WhatsApp/Telegram**：直接发送语音消息 - Clawdbot 会转录并回复！
+### 自定义提示词
 
-#### 浏览器控制
-
-```
-你：打开 google.com 搜索"AWS Bedrock"
-Clawdbot：*打开浏览器，执行搜索，返回结果*
-```
-
-#### 定时任务
-
-```
-你：每天早上9点提醒我查看邮件
-Clawdbot：*创建 cron 任务*
-```
-
-### 高级功能
-
-#### 安装技能
-
-```bash
-# 列出可用技能
-clawdbot skills list
-
-# 安装技能
-clawdbot skills install voice-generation
-
-# 查看已安装技能
-clawdbot skills installed
-```
-
-#### 自定义提示词
-
-在实例上创建 `~/clawd/system.md`：
+在实例上创建 `~/openclaw/system.md`：
 
 ```markdown
 你是我的个人助手。请简洁且有帮助。
 始终以友好的语气回复。
 ```
 
-详细指南请访问 [openclaw 文档](https://docs.clawd.bot/)。
+详细指南请访问 [openclaw 文档](https://docs.openclaw.ai/)。
 
 ## 架构
 
 ```
 你的电脑
-     │
      │ AWS CLI + SSM Plugin
      ▼
 SSM Service（AWS 私有网络）
-     │
      │ 端口转发
      ▼
 EC2 实例（openclaw）
-     │
      │ IAM Role 认证
      ▼
-Amazon Bedrock（Claude Sonnet 4）
+Amazon Bedrock（Nova/Claude）
 ```
 
 **核心组件**：
-- **EC2 实例**：运行 openclaw gateway 和浏览器控制
+- **EC2 实例**：运行 openclaw gateway
 - **IAM Role**：与 Bedrock 认证（无需 API Key）
 - **SSM Session Manager**：安全访问，无需公网端口
 - **VPC 端点**：私有网络访问 Bedrock
-- **Lambda 预检查**：部署前验证环境
 
 ## 成本
 
 ### 月度基础设施成本
 
-| 服务 | 成本 |
-|------|------|
-| EC2 (t3.medium) | $30 |
-| EBS (30GB) | $2.40 |
-| VPC 端点 (3个) | $22 |
-| 数据传输 | $5-10 |
-| **小计** | **$60-65** |
+| 服务 | 配置 | 月度成本 |
+|------|------|----------|
+| EC2 (c7g.large, Graviton) | 2 vCPU, 4GB RAM | $52.60 |
+| EBS (gp3) | 30GB | $2.40 |
+| VPC 端点 | 5 个端点 | $29 |
+| **小计** | | **~$84** |
 
 ### Bedrock 使用成本（按量付费）
 
 | 模型 | 输入 | 输出 |
 |------|------|------|
-| Claude Sonnet 4 | $3/百万 tokens | $15/百万 tokens |
-| Claude 3.5 Sonnet v2 | $3/百万 tokens | $15/百万 tokens |
-| Claude 3.5 Haiku | $1/百万 tokens | $5/百万 tokens |
-| Claude 3 Haiku | $0.25/百万 tokens | $1.25/百万 tokens |
-| Claude 3 Opus | $15/百万 tokens | $75/百万 tokens |
+| Nova 2 Lite（默认） | $0.30/百万 tokens | $2.50/百万 tokens |
+| Nova Pro | $0.80/百万 tokens | $3.20/百万 tokens |
+| Claude Sonnet 4.5 | $3/百万 tokens | $15/百万 tokens |
+| Claude Haiku 4.5 | $1/百万 tokens | $5/百万 tokens |
+| DeepSeek R1 | $0.55/百万 tokens | $2.19/百万 tokens |
+| Kimi K2.5 | $0.60/百万 tokens | $3.00/百万 tokens |
 
-**示例**：每天 100 次对话（Sonnet 4）≈ $10-15/月
-
-**总计**：轻度使用约 $70-80/月
+**示例**：每天 100 次对话（Nova 2 Lite）≈ $5-8/月
 
 ### 成本优化
 
-- 使用 Nova 或 Haiku：比 Claude 便宜 70%+
-- 禁用 VPC 端点：节省 $22/月（安全性降低）
+- 使用 Nova 2 Lite 替代 Claude：便宜 90%
+- 使用 Graviton 实例：比 x86 便宜 20-40%
+- 禁用 VPC 端点：节省 $29/月（安全性降低）
 - 使用 Savings Plans：EC2 节省 30-40%
-
-## 架构与数据流
-
-### 简单聊天示例
-```
-你（WhatsApp）："AWS Bedrock 是什么？"
-     ↓
-EC2（Clawdbot）：接收 → 调用 Bedrock → 获取回复
-     ↓
-你：2-3 秒内收到答案
-
-成本：约 $0.001 | 安全：IAM 认证，私有网络 | 数据：留在 AWS
-```
-
-### 高级功能：视频创建示例
-```
-你："创建一个 10 秒关于 AWS 的视频"
-     ↓
-EC2（Clawdbot）：
-  1. Bedrock 生成脚本（$0.01）
-  2. 调用 Runway API（$0.50，需要你的 API key）
-  3. 下载视频到 /tmp（约 50MB）
-  4. 可选：ffmpeg 处理
-  5. 发送到 WhatsApp
-     ↓
-你：收到视频
-
-总计：$0.51 | 时间：30-60 秒 | 资源：1GB 内存，50MB 磁盘
-```
-
-### 为什么 EC2 安全、可靠、经济？
-
-**🔒 安全性**：
-- 所有数据在你的 AWS 账号（不经过第三方服务器）
-- IAM 认证（无需担心 API Key 泄露）
-- VPC 端点（流量保持在 AWS 私有网络）
-- CloudTrail 审计日志（每次 API 调用都被记录）
-
-**🛡️ 可靠性**：
-- 24/7 可用（即使你的电脑关机）
-- 自动重启（systemd 守护）
-- 多平台同时支持（WhatsApp、Telegram、Discord）
-
-**💰 经济性**：
-- 基础设施：约 $60-65/月（EC2 + VPC 端点）
-- AI 使用：约 $10-50/月（按量付费）
-- 总计：约 $70-115/月
-- 对比：5 人 × ChatGPT Plus（$100/月）vs 1 个 Clawdbot（$70/月）
 
 ## 配置
 
@@ -431,187 +284,86 @@ EC2（Clawdbot）：
 
 ```yaml
 OpenClawModel:
-  - anthropic.claude-sonnet-4-5-20250929-v1:0  # 默认，最强能力
-  - anthropic.claude-3-5-sonnet-20241022-v2:0  # 稳定备选
-  - anthropic.claude-3-5-haiku-20241022-v1:0   # 更快，更便宜
-  - anthropic.claude-3-haiku-20240307-v1:0     # 最快/最便宜
-  - moonshotai.kimi-k2.5                       # 多模态智能体，262K 上下文
+  - global.amazon.nova-2-lite-v1:0              # 默认，最经济
+  - global.anthropic.claude-sonnet-4-5-20250929-v1:0  # 最强能力
+  - us.amazon.nova-pro-v1:0                     # 性能与成本平衡
+  - global.anthropic.claude-haiku-4-5-20251001-v1:0   # 快速经济
+  - us.deepseek.r1-v1:0                         # 开源推理
+  - us.meta.llama3-3-70b-instruct-v1:0          # 开源备选
+  - moonshotai.kimi-k2.5                        # 多模态，262K 上下文
 ```
-
-**模型选择指南**：
-- **Claude Sonnet 4.5**（默认）：最佳性能、编码和复杂推理能力。在全球 30+ 个区域可用。
-- **Nova v2**：性能和可用性的最佳平衡。
-- **Claude 3.5 Haiku**：快速且经济，适合简单任务。
-- **Kimi K2.5**：多模态智能体模型（文本 + 视觉），262K 上下文窗口，$0.60/$3.00 每百万 tokens。
 
 ### 实例类型
 
 ```yaml
 InstanceType:
-  - t3.small   # $15/月 - 轻度使用
-  - t3.medium  # $30/月 - 推荐
-  - c5.xlarge  # $120/月 - 高性能
+  # Graviton（ARM）- 推荐，性价比最高
+  - t4g.small   # $12/月，2GB RAM
+  - t4g.medium  # $24/月，4GB RAM
+  - c7g.large   # $52/月，4GB RAM（默认）
+  - c7g.xlarge  # $108/月，8GB RAM
+  # x86 - 兼容性备选
+  - t3.medium   # $30/月，4GB RAM
+  - c5.xlarge   # $122/月，8GB RAM
 ```
 
 ### VPC 端点
 
 ```yaml
-CreateVPCEndpoints: true   # 生产环境推荐
-  # 优点：私有网络，安全，合规
-  # 缺点：+$22/月
-
-CreateVPCEndpoints: false  # 成本优化
-  # 优点：节省 $22/月
-  # 缺点：流量经过公网
+CreateVPCEndpoints: true   # 生产环境推荐，流量保持在 AWS 内网
+CreateVPCEndpoints: false  # 节省 $29/月，流量经过公网
 ```
 
-## 资源
+## 安全特性
 
-- [openclaw 文档](https://docs.clawd.bot/)
-- [openclaw GitHub](https://github.com/openclaw/openclaw)
-- [Amazon Bedrock](https://aws.amazon.com/bedrock/)
-- [SSM Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html)
+- **IAM Role 认证**：无需 API Key，EC2 实例通过 IAM 角色与 Bedrock 认证
+- **SSM Session Manager**：无需公网端口，自动会话日志，CloudTrail 审计
+- **VPC 端点**：Bedrock API 调用不经过公网，更低延迟，符合合规要求
 
-## 支持
-
-### 1. IAM Role 认证
-
-无需 API Key。EC2 实例使用 IAM 角色与 Bedrock 认证：
-
-```json
-{
-  "Effect": "Allow",
-  "Action": [
-    "bedrock:InvokeModel",
-    "bedrock:InvokeModelWithResponseStream"
-  ],
-  "Resource": "*"
-}
-```
-
-### 2. SSM Session Manager
-
-无需 SSH 密钥。通过 AWS Systems Manager 访问：
-
-- ✅ 无需公网端口（除可选的 SSH 备用）
-- ✅ 自动会话日志
-- ✅ CloudTrail 审计追踪
-- ✅ 会话超时控制
-
-### 3. VPC 端点
-
-流量保持在 AWS 网络内：
-
-- ✅ Bedrock API 调用不经过公网
-- ✅ 更低延迟
-- ✅ 符合合规要求
-
-### 4. Docker 沙箱
-
-非主会话在隔离的 Docker 容器中运行：
-
-```json
-{
-  "sandbox": {
-    "mode": "non-main",
-    "allowlist": ["bash", "read", "write"],
-    "denylist": ["browser", "gateway"]
-  }
-}
-```
-
-## 监控和审计
-
-### CloudTrail 日志
-
-所有 Bedrock API 调用自动记录：
-
-```bash
-aws cloudtrail lookup-events \
-  --lookup-attributes AttributeKey=EventName,AttributeValue=InvokeModel \
-  --region us-west-2
-```
-
-### CloudWatch 日志
-
-```bash
-# 查看安装日志
-aws logs tail /var/log/clawdbot-setup.log --follow
-
-# 查看 SSM 会话日志
-aws logs tail /aws/ssm/session-logs --follow
-```
-
-### 成本监控
-
-```bash
-# 查看 Bedrock 成本
-aws ce get-cost-and-usage \
-  --time-period Start=2026-01-01,End=2026-01-31 \
-  --granularity DAILY \
-  --metrics BlendedCost \
-  --filter '{"Dimensions":{"Key":"SERVICE","Values":["Amazon Bedrock"]}}'
-```
+**完整安全文档**：[SECURITY.md](SECURITY.md)
 
 ## 故障排查
 
 ### 通过 SSM 命令行登录实例
 
-如果需要像 SSH 一样直接登录 EC2 实例操作命令行，使用 SSM Session Manager：
-
 ```bash
-# 1. 启动交互式会话（替换为你的实例 ID 和区域）
+# 启动交互式会话（类似 SSH）
 aws ssm start-session --target i-xxxxxxxxxxxxxxxxx --region us-east-1
 
-# 2. 切换到 ubuntu 用户
+# 切换到 ubuntu 用户
 sudo su - ubuntu
 
-# 3. 现在可以直接执行 openclaw 命令
+# 执行 openclaw 命令
 openclaw --version
 openclaw gateway status
 ```
 
-> **提示**：实例 ID 在 CloudFormation 输出标签的 `InstanceId` 字段中。
-> 本地需要安装 [SSM Session Manager Plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html)。
-
-### 预检查失败
+### 查看安装日志
 
 ```bash
-# 查看 Lambda 日志
-aws logs tail /aws/lambda/clawdbot-bedrock-bedrock-precheck --follow
+# 最近 100 行
+sudo tail -100 /var/log/openclaw-setup.log
 
-# 常见问题：
-# 1. 模型未启用 → 在 Bedrock Console 启用
-# 2. 区域不支持 → 使用 us-east-1 或 us-west-2
-# 3. 权限不足 → 检查 IAM 权限
+# 实时跟踪（安装中）
+sudo tail -f /var/log/openclaw-setup.log
+
+# 完整 cloud-init 日志
+sudo cat /var/log/cloud-init-output.log
 ```
 
-### 无法通过 SSM 连接
+### 常见问题
 
+**WaitCondition timed out**：安装过程中出错导致 cfn-signal 未发出。登录实例查看 `/var/log/openclaw-setup.log` 确认具体报错。
+
+**SSM 无法连接**：
 ```bash
-# 检查 SSM agent 状态
 aws ssm describe-instance-information \
   --filters "Key=InstanceIds,Values=$INSTANCE_ID"
-
-# 检查 IAM 角色
-aws ec2 describe-instances \
-  --instance-ids $INSTANCE_ID \
-  --query 'Reservations[0].Instances[0].IamInstanceProfile'
 ```
 
-### Bedrock API 错误
+**Bedrock API 错误**：确认已在 [Bedrock Console](https://console.aws.amazon.com/bedrock/) 启用对应模型。
 
-```bash
-# 测试 Bedrock 访问
-aws bedrock-runtime invoke-model \
-  --model-id us.anthropic.claude-sonnet-4-20250514-v1:0 \
-  --body '{"anthropic_version":"bedrock-2023-05-31","max_tokens":10,"messages":[{"role":"user","content":"Hi"}]}' \
-  --region us-west-2 \
-  output.txt
-
-# 查看 Clawdbot 日志
-journalctl --user -u clawdbot-gateway -n 100
-```
+**完整排错指南**：[TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 
 ## macOS 部署
 
@@ -632,70 +384,38 @@ journalctl --user -u clawdbot-gateway -n 100
 | mac2-m2.metal | M2 | 24GB | $632 | 最新芯片 |
 | mac2-m2pro.metal | M2 Pro | 32GB | $792 | 高性能 |
 
-### 部署 Mac 版本
-
-点击上方 macOS 部分的"部署"按钮。**重要**：必须指定支持 Mac 实例的可用区（先在 AWS 控制台检查）。
-
-**访问方式**：与 Linux 相同（SSM Session Manager + 端口转发）
-
----
+部署时必须指定支持 Mac 实例的可用区（先在 AWS 控制台确认）。访问方式与 Linux 相同（SSM + 端口转发）。
 
 ## 与原版对比
 
-### 原版（Anthropic API + Tailscale）
-
-```bash
-# 需要：
-- Anthropic API key（手动管理）
-- Tailscale 账号（第三方服务）
-- 手动安全配置
-
-# 成本：~$40/月 + API 费用
-```
-
-### 本项目（Bedrock + SSM）
-
-```bash
-# 需要：
-- 仅需 AWS 账号
-- IAM 认证（自动）
-- AWS 原生服务
-
-# 成本：~$65/月 + Bedrock 费用
-# 额外的 $25/月 换来：
-# - 无需管理 API Key
-# - 多模型支持（Claude、Nova、DeepSeek）
-# - 完整审计日志
-# - 企业合规支持
-# - AWS 技术支持覆盖
-```
+| | 原版（本地部署） | 本项目（AWS） |
+|--|----------------|--------------|
+| **配置** | 手动安装，配置 API Key，Tailscale VPN | CloudFormation 一键，8 分钟就绪 |
+| **成本** | $20-30/月 API 费（不含硬件） | $36-50/月全包 |
+| **模型** | 单一供应商，手动切换 | 8 个模型，一个参数切换 |
+| **安全** | API Key 存配置文件，无审计 | IAM 认证，CloudTrail 全审计 |
+| **可用性** | 依赖本地硬件和网络 | 99.99% SLA |
 
 ## 贡献
 
-欢迎贡献！请：
-
-1. Fork 仓库
-2. 创建 feature 分支
-3. 提交 Pull Request
+欢迎贡献！Fork 仓库 → 创建 feature 分支 → 提交 Pull Request。
 
 ## 许可证
 
-MIT License。详见 [LICENSE](LICENSE)。
-
-Clawdbot 本身有独立的许可证。参见 [Clawdbot License](https://github.com/clawdbot/clawdbot)。
+MIT License。openclaw 本身有独立许可证，详见 [openclaw GitHub](https://github.com/openclaw/openclaw)。
 
 ## 资源
 
-- [openclaw 文档](https://docs.clawd.bot/)
+- [openclaw 文档](https://docs.openclaw.ai/)
 - [openclaw GitHub](https://github.com/openclaw/openclaw)
 - [Amazon Bedrock](https://aws.amazon.com/bedrock/)
 - [SSM Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html)
 
 ## 支持
 
-- **openclaw**：[GitHub Issues](https://github.com/openclaw/openclaw/issues) | [Discord](https://discord.gg/openclaw)
+- **openclaw**：[GitHub Issues](https://github.com/openclaw/openclaw/issues)
 - **AWS Bedrock**：[AWS re:Post](https://repost.aws/tags/bedrock)
-- **本项目**：[GitHub Issues](https://github.com/JiaDe-Wu/clawdbot-aws-bedrock/issues)
+- **本项目**：[GitHub Issues](https://github.com/aws-samples/sample-OpenClaw-on-AWS-with-Bedrock/issues)
 
 ---
 

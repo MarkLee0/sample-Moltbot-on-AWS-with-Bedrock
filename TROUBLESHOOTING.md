@@ -22,28 +22,23 @@ sudo su - ubuntu
 ### openclaw Common Commands
 
 ```bash
-# Check status
-clawdbot status
-clawdbot status --deep
+# Check gateway status
+openclaw gateway status
 
-# View logs
-clawdbot logs --follow
-clawdbot logs -n 100
-
-# Restart service
-XDG_RUNTIME_DIR=/run/user/1000 systemctl --user restart clawdbot-gateway
+# Restart gateway service
+XDG_RUNTIME_DIR=/run/user/1000 systemctl --user restart openclaw-gateway.service
 
 # Check service status
-XDG_RUNTIME_DIR=/run/user/1000 systemctl --user status clawdbot-gateway
+XDG_RUNTIME_DIR=/run/user/1000 systemctl --user status openclaw-gateway.service
 
-# View systemd logs
-XDG_RUNTIME_DIR=/run/user/1000 journalctl --user -u clawdbot-gateway -n 100 -f
+# View gateway logs
+XDG_RUNTIME_DIR=/run/user/1000 journalctl --user -u openclaw-gateway.service -n 100 -f
 
 # Check configuration
-cat ~/.clawdbot/clawdbot.json | python3 -m json.tool
+cat ~/.openclaw/openclaw.json | python3 -m json.tool
 
 # Get gateway token
-cat ~/.clawdbot/gateway_token.txt
+cat ~/.openclaw/gateway_token.txt
 
 # Test Bedrock connection
 REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/region)
@@ -52,6 +47,21 @@ aws bedrock-runtime invoke-model \
   --body '{"messages":[{"role":"user","content":[{"text":"Hello"}]}],"inferenceConfig":{"maxTokens":100}}' \
   --region $REGION \
   /tmp/test.json && cat /tmp/test.json
+```
+
+### View Setup Logs
+
+If deployment fails or openclaw isn't working, check the setup logs on the instance:
+
+```bash
+# Last 100 lines of setup log
+sudo tail -100 /var/log/openclaw-setup.log
+
+# Follow setup log in real time (if still running)
+sudo tail -f /var/log/openclaw-setup.log
+
+# Full cloud-init log
+sudo cat /var/log/cloud-init-output.log
 ```
 
 ---

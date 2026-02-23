@@ -2,6 +2,10 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'OpenClaw - AWS Native Deployment on Mac Instances (Bedrock + SSM + VPC Endpoints)'
 
 Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - E6101
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
@@ -74,13 +78,6 @@ Parameters:
       - "true"
       - "false"
 
-  EnableSandbox:
-    Type: String
-    Default: "true"
-    AllowedValues:
-      - "true"
-      - "false"
-
 Conditions:
   CreateEndpoints: !Equals [!Ref CreateVPCEndpoints, "true"]
   HasKeyPair: !Not [!Equals [!Ref KeyPairName, "none"]]
@@ -137,9 +134,6 @@ Resources:
       AutoPlacement: "on"
       AvailabilityZone: !Ref MacAvailabilityZone
       InstanceType: !Ref MacInstanceType
-      Tags:
-        - Key: Name
-          Value: !Sub "${AWS::StackName}-mac-host"
 
   # ==================== VPC and Network ====================
   OpenClawVPC:
@@ -363,7 +357,6 @@ Resources:
   # ==================== EC2 Mac Instance ====================
   OpenClawInstance:
     Type: AWS::EC2::Instance
-    DependsOn: MacDedicatedHost
     Properties:
       ImageId: !If
         - UseCustomAmi
@@ -593,46 +586,32 @@ Resources:
           # Install and start OpenClaw gateway using launchd (macOS native)
           echo "[8/9] Installing OpenClaw gateway service..."
           
-          # Create launchd plist for openclaw gateway
-          cat > /Library/LaunchDaemons/com.openclaw.gateway.plist << 'PLISTEOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>Label</key>
-            <string>com.openclaw.gateway</string>
-            <key>ProgramArguments</key>
-            <array>
-              <string>/bin/bash</string>
-              <string>-c</string>
-              <string>source /Users/ec2-user/.nvm/nvm.sh && openclaw gateway</string>
-            </array>
-            <key>UserName</key>
-            <string>ec2-user</string>
-            <key>WorkingDirectory</key>
-            <string>/Users/ec2-user</string>
-            <key>EnvironmentVariables</key>
-            <dict>
-              <key>HOME</key>
-              <string>/Users/ec2-user</string>
-              <key>PATH</key>
-              <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin</string>
-            </dict>
-            <key>RunAtLoad</key>
-            <true/>
-            <key>KeepAlive</key>
-            <true/>
-            <key>StandardOutPath</key>
-            <string>/tmp/openclaw-gateway.log</string>
-            <key>StandardErrorPath</key>
-            <string>/tmp/openclaw-gateway.err</string>
-          </dict>
-          </plist>
-          PLISTEOF
+          # Build absolute paths for launchd (cannot rely on nvm in launchd env)
+          OPENCLAW_MJS_PATH=$(find $USER_HOME/.nvm -path "*/node_modules/openclaw/openclaw.mjs" 2>/dev/null | head -1)
+          NODE_BIN_PATH=$(find $USER_HOME/.nvm -name node -type f 2>/dev/null | head -1)
           
-          # Load and start the service
-          launchctl load -w /Library/LaunchDaemons/com.openclaw.gateway.plist || true
+          # Write plist with absolute paths using echo (avoids heredoc YAML issues)
+          PLIST_FILE="/Library/LaunchDaemons/com.openclaw.gateway.plist"
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > $PLIST_FILE
+          echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >> $PLIST_FILE
+          echo '<plist version="1.0"><dict>' >> $PLIST_FILE
+          echo '<key>Label</key><string>com.openclaw.gateway</string>' >> $PLIST_FILE
+          echo '<key>ProgramArguments</key><array>' >> $PLIST_FILE
+          echo "<string>$NODE_BIN_PATH</string>" >> $PLIST_FILE
+          echo "<string>$OPENCLAW_MJS_PATH</string>" >> $PLIST_FILE
+          echo '</array>' >> $PLIST_FILE
+          echo "<key>UserName</key><string>$CURRENT_USER</string>" >> $PLIST_FILE
+          echo "<key>WorkingDirectory</key><string>$USER_HOME</string>" >> $PLIST_FILE
+          echo '<key>EnvironmentVariables</key><dict>' >> $PLIST_FILE
+          echo "<key>HOME</key><string>$USER_HOME</string>" >> $PLIST_FILE
+          echo "<key>AWS_REGION</key><string>$AWS_REGION</string>" >> $PLIST_FILE
+          echo '</dict>' >> $PLIST_FILE
+          echo '<key>RunAtLoad</key><true/><key>KeepAlive</key><true/>' >> $PLIST_FILE
+          echo '<key>StandardOutPath</key><string>/tmp/openclaw-gateway.log</string>' >> $PLIST_FILE
+          echo '<key>StandardErrorPath</key><string>/tmp/openclaw-gateway.err</string>' >> $PLIST_FILE
+          echo '</dict></plist>' >> $PLIST_FILE
           
+          launchctl load -w $PLIST_FILE || true
           # Enable messaging channels
           echo "[8.5/9] Enabling messaging channels..."
           sudo -u $CURRENT_USER bash << 'CHANNELSCRIPT'
@@ -659,14 +638,19 @@ Resources:
           openclaw plugins enable googlechat || echo "Google Chat plugin enable failed"
           CHANNELSCRIPT
           
-          # Wait for gateway to start
-          sleep 5
+          # Wait for port 18789 to be ready
+          echo "Waiting for OpenClaw gateway to start..."
+          for i in $(seq 1 30); do
+            if lsof -i :18789 > /dev/null 2>&1; then
+              echo "OpenClaw gateway is up on port 18789"
+              break
+            fi
+            echo "Attempt $i/30: port 18789 not ready yet, waiting..."
+            sleep 2
+          done
           
-          # Verify gateway is running
-          if lsof -i :18789 > /dev/null 2>&1; then
-            echo "OpenClaw gateway started successfully"
-          else
-            echo "Warning: Gateway may not have started, check /tmp/openclaw-gateway.log"
+          if ! lsof -i :18789 > /dev/null 2>&1; then
+            echo "WARNING: Gateway did not start within 60s, check /tmp/openclaw-gateway.err"
           fi
           
           # Save token
@@ -791,13 +775,16 @@ Outputs:
 
   MonthlyCost:
     Description: "Estimated monthly cost (USD) - Mac instances require 24-hour minimum allocation"
-    Value: !Sub |
-      Mac Dedicated Host (${MacInstanceType}): ~$650-1100/month (24hr minimum)
-      EBS (100GB): ~$8
-      VPC Endpoints: ${!If [CreateEndpoints, "~$29 ($0.01/hour x 5 endpoints)", "$0"]}
-      Bedrock: Pay-per-use
-      Total: ~${!If [CreateEndpoints, "$687-1137", "$658-1108"]}/month
-      Note: Mac instances have 24-hour minimum allocation period
+    Value: !Sub
+      - |
+        Mac Dedicated Host (${MacInstanceType}): ~$650-1100/month (24hr minimum)
+        EBS (100GB): ~$8
+        VPC Endpoints: ${EndpointCost}
+        Bedrock: Pay-per-use
+        Total: ~${TotalCost}/month
+        Note: Mac instances have 24-hour minimum allocation period
+      - EndpointCost: !If [CreateEndpoints, "~$29 ($0.01/hour x 5 endpoints)", "$0"]
+        TotalCost: !If [CreateEndpoints, "$687-1137", "$658-1108"]
 
   ImportantNotes:
     Description: "Important notes about Mac instances"

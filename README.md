@@ -54,9 +54,9 @@ English | [简体中文](README_CN.md)
 ## Key Benefits
 
 - 🔐 **No API Key Management** - IAM roles handle authentication automatically
-- 🤖 **Multi-Model Support** - Switch between Claude 4.6, Nova, DeepSeek
+- 🤖 **Multi-Model Support** - Switch between Claude, Nova, DeepSeek with one parameter
 - 🏢 **Enterprise-Ready** - Full CloudTrail audit logs and compliance support
-- 🚀 **One-Click Deploy** - CloudFormation automates everything
+- 🚀 **One-Click Deploy** - CloudFormation automates everything in ~8 minutes
 - 🔒 **Secure Access** - SSM Session Manager, no public ports exposed
 - 💰 **Cost Visibility** - Native AWS cost tracking and optimization
 
@@ -112,7 +112,7 @@ Choose this if you need:
 **What happens automatically**:
 - Creates VPC, subnets, security groups
 - Launches EC2 instance
-- Installs Node.js, Docker, Clawdbot
+- Installs Node.js, openclaw
 - Configures Bedrock integration
 - Generates secure gateway token
 - Outputs ready-to-use URL with token
@@ -165,75 +165,38 @@ Click to deploy:
 > - Create an EC2 key pair in your target region
 > - Lambda will automatically validate Bedrock access during deployment
 
-### Alternative: Download and Upload
-
-1. Download: [clawdbot-bedrock.yaml](clawdbot-bedrock.yaml)
-2. Go to [CloudFormation Console](https://console.aws.amazon.com/cloudformation/)
-3. Upload template and deploy
-
-| Region | Launch Stack |
-|--------|--------------|
-| **US East (N. Virginia)** | [![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?stackName=clawdbot-bedrock&templateURL=https://clawdbot-templates-jiade.s3.amazonaws.com/clawdbot-bedrock.yaml) |
-| **US West (Oregon)** | [![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/create/review?stackName=clawdbot-bedrock&templateURL=https://clawdbot-templates-jiade.s3.amazonaws.com/clawdbot-bedrock.yaml) |
-
-> **Before deploying**: 
-> 1. Enable Bedrock models in [Bedrock Console](https://console.aws.amazon.com/bedrock/)
-> 2. Create an EC2 key pair in your target region
-
 ### Alternative: CLI Deploy
-
-- AWS account with Bedrock access
-- [AWS CLI](https://aws.amazon.com/cli/) installed
-- [SSM Session Manager Plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) installed
-- EC2 key pair created
-
-### Manual Deploy (Alternative)
-
-**Using helper script**:
-
-```bash
-./scripts/deploy.sh clawdbot-bedrock us-west-2 your-keypair
-```
-
-**Using AWS CLI**:
 
 ```bash
 aws cloudformation create-stack \
-  --stack-name clawdbot-bedrock \
-  --template-body file://cloudformation/clawdbot-bedrock.yaml \
+  --stack-name openclaw-bedrock \
+  --template-body file://clawdbot-bedrock.yaml \
   --parameters ParameterKey=KeyPairName,ParameterValue=your-keypair \
   --capabilities CAPABILITY_IAM \
   --region us-west-2
 
-# Wait for completion
 aws cloudformation wait stack-create-complete \
-  --stack-name clawdbot-bedrock \
+  --stack-name openclaw-bedrock \
   --region us-west-2
 ```
 
-> **Note**: Lambda pre-check runs automatically during deployment. If it fails, check CloudFormation events for details.
-
-### Access Clawdbot
+### Access openclaw
 
 ```bash
-# Get instance ID
+# Get instance ID from CloudFormation Outputs, or:
 INSTANCE_ID=$(aws cloudformation describe-stacks \
-  --stack-name clawdbot-bedrock \
+  --stack-name openclaw-bedrock \
   --query 'Stacks[0].Outputs[?OutputKey==`InstanceId`].OutputValue' \
   --output text)
 
-# Start port forwarding
+# Start port forwarding (keep this terminal open)
 aws ssm start-session \
   --target $INSTANCE_ID \
+  --region us-west-2 \
   --document-name AWS-StartPortForwardingSession \
   --parameters '{"portNumber":["18789"],"localPortNumber":["18789"]}'
 
-# Get token (new terminal)
-aws ssm start-session --target $INSTANCE_ID
-sudo su - ubuntu
-cat ~/.clawdbot/gateway_token.txt
-
-# Open browser
+# Open in browser (token is shown in CloudFormation Outputs > Step3AccessURL)
 http://localhost:18789/?token=<your-token>
 ```
 
@@ -241,7 +204,7 @@ http://localhost:18789/?token=<your-token>
 
 ### Connect Messaging Platforms
 
-**For detailed configuration guides, visit [openclaw Official Documentation](https://docs.clawd.bot/).**
+**For detailed configuration guides, visit [openclaw Official Documentation](https://docs.openclaw.ai/).**
 
 #### WhatsApp (Recommended)
 
@@ -254,7 +217,7 @@ http://localhost:18789/?token=<your-token>
 
 **Tip**: Use a dedicated phone number or enable `selfChatMode` for personal number.
 
-📖 **Full guide**: https://docs.clawd.bot/channels/whatsapp
+📖 **Full guide**: https://docs.openclaw.ai/channels/whatsapp
 
 #### Telegram
 
@@ -268,7 +231,7 @@ http://localhost:18789/?token=<your-token>
 3. **Configure**: In Web UI, add Telegram channel with your bot token
 4. **Test**: Send `/start` to your bot on Telegram
 
-📖 **Full guide**: https://docs.clawd.bot/channels/telegram
+📖 **Full guide**: https://docs.openclaw.ai/channels/telegram
 
 #### Discord
 
@@ -284,7 +247,7 @@ http://localhost:18789/?token=<your-token>
 3. **Configure**: In Web UI, add Discord channel with bot token
 4. **Test**: Mention your bot in a Discord channel
 
-📖 **Full guide**: https://docs.clawd.bot/channels/discord
+📖 **Full guide**: https://docs.openclaw.ai/channels/discord
 
 #### Slack
 
@@ -294,13 +257,13 @@ http://localhost:18789/?token=<your-token>
 4. **Configure**: In Web UI, add Slack channel
 5. **Test**: Invite bot to a channel and mention it
 
-📖 **Full guide**: https://docs.clawd.bot/channels/slack
+📖 **Full guide**: https://docs.openclaw.ai/channels/slack
 
 #### Microsoft Teams
 
 **Microsoft Teams integration requires Azure Bot setup and is more complex.**
 
-📖 **Full guide**: https://docs.clawd.bot/channels/msteams
+📖 **Full guide**: https://docs.openclaw.ai/channels/msteams
 
 **Note**: This integration requires additional configuration beyond the scope of this quick start.
 
@@ -320,13 +283,7 @@ Install on your EC2 instance to forward messages between Feishu and openclaw via
 
 ```
 You: What's the weather today?
-Clawdbot: Let me check that for you...
-```
-
-**Via CLI**:
-```bash
-# SSH/SSM to instance
-clawdbot message send --to +1234567890 --message "Hello"
+openclaw: Let me check that for you...
 ```
 
 #### Chat Commands
@@ -342,40 +299,27 @@ Send these in any connected channel:
 
 #### Voice Messages
 
-**WhatsApp/Telegram**: Send voice notes directly - Clawdbot will transcribe and respond!
+**WhatsApp/Telegram**: Send voice notes directly - openclaw will transcribe and respond!
 
 #### Browser Control
 
 ```
 You: Open google.com and search for "AWS Bedrock"
-Clawdbot: *Opens browser, performs search, returns results*
+openclaw: *Opens browser, performs search, returns results*
 ```
 
 #### Scheduled Tasks
 
 ```
 You: Remind me every day at 9am to check emails
-Clawdbot: *Creates cron job*
+openclaw: *Creates cron job*
 ```
 
 ### Advanced Features
 
-#### Skills
-
-```bash
-# List available skills
-clawdbot skills list
-
-# Install a skill
-clawdbot skills install voice-generation
-
-# View installed skills
-clawdbot skills installed
-```
-
 #### Custom Prompts
 
-Create `~/clawd/system.md` on the instance:
+Create `~/openclaw/system.md` on the instance:
 
 ```markdown
 You are my personal assistant. Be concise and helpful.
@@ -386,7 +330,7 @@ Always respond in a friendly tone.
 
 Configure different agents for different channels in Web UI.
 
-For detailed guides, visit [openclaw Documentation](https://docs.clawd.bot/).
+For detailed guides, visit [openclaw Documentation](https://docs.openclaw.ai/).
 
 ## Architecture
 
@@ -397,21 +341,7 @@ Your Phone/Computer → WhatsApp/Telegram → EC2 (openclaw) → Bedrock (Claude
                                          (Secure, Private, Audited)
 ```
 
-### Why EC2 + Bedrock?
-
-**🔒 Security**: IAM roles replace API keys—no credentials to leak. CloudTrail logs every API call for compliance.
-
-**💰 Cost**: Multi-model strategy (Nova 90% cheaper than Claude) + Graviton (20% cheaper than x86) = $39/month total.
-
-**🛡️ Reliability**: 99.99% uptime in enterprise data centers vs home internet. Auto-restart, CloudWatch monitoring included.
-
-**📊 Transparency**: Cost Explorer tracks every dollar. CloudTrail audits every API call. No guessing.
-
-**🌐 Scale**: Deploy globally with identical config. Global CRIS auto-routes to optimal regions. Scale t4g.small to c7g.xlarge in minutes.
-
-**🚀 Orchestration**: openclaw can spin up 100 Spot instances for parallel tasks, trigger Glue jobs, invoke Lambda—impossible on local hardware.
-
-### Architecture
+## Architecture
 
 ```
 ┌─────────────┐
@@ -646,11 +576,11 @@ Contributions welcome! Please:
 
 ## License
 
-This deployment template is provided as-is. Clawdbot itself is licensed under its original license.
+This deployment template is provided as-is. openclaw itself is licensed under its original license.
 
 ## Resources
 
-- [openclaw Official Docs](https://docs.clawd.bot/)
+- [openclaw Official Docs](https://docs.openclaw.ai/)
 - [openclaw GitHub](https://github.com/openclaw/openclaw)
 - [Amazon Bedrock Docs](https://docs.aws.amazon.com/bedrock/)
 - [SSM Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html)
